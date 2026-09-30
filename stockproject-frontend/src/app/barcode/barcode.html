@@ -1,0 +1,128 @@
+<div class="barcode-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Barcode & RFID Scanning Terminal</h1>
+      <p class="page-subtitle">Instant inventory identification, SKU lookup, and stock verification</p>
+    </div>
+  </div>
+
+  <div class="scanner-grid">
+
+    <!-- Scanner Input Terminal -->
+    <div class="card terminal-card">
+      <div class="card-header">
+        <h2 class="card-title">Scanner Terminal</h2>
+        <p class="card-subtitle">Supports optical laser scanners, 2D QR, and manual input</p>
+      </div>
+
+      <div class="card-body">
+        <div class="scanner-illustration">
+          <div class="scanner-beacon">
+            <span class="laser-beam"></span>
+            <span class="barcode-graphic">||||| ||| |||| |||||</span>
+          </div>
+        </div>
+
+        <form (ngSubmit)="scanBarcode()" class="scan-form">
+          <div class="form-group">
+            <label>Scan or Type Barcode SKU</label>
+            <div class="input-with-action">
+              <input
+                type="text"
+                placeholder="e.g. 89010001 or scan now..."
+                [(ngModel)]="barcode"
+                name="barcodeInput"
+                autofocus
+              />
+              <button type="submit" class="btn btn-primary" [disabled]="isSearching">
+                {{ isSearching ? 'Searching...' : 'Scan / Lookup' }}
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div class="alert" 
+          *ngIf="message" 
+          [class.alert-success]="statusType === 'success'"
+          [class.alert-danger]="statusType === 'error'"
+          [class.alert-info]="statusType === 'info'">
+          {{ message }}
+        </div>
+
+        <!-- Quick barcode history -->
+        <div class="recent-scans" *ngIf="recentScans.length > 0">
+          <span class="recent-title">Recent Scans:</span>
+          <div class="recent-tags">
+            <span 
+              *ngFor="let scan of recentScans" 
+              class="scan-tag"
+              (click)="selectRecent(scan)">
+              {{ scan.barcode }} ({{ scan.name }})
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Live Card -->
+    <div class="card product-card">
+      <div class="card-header">
+        <h2 class="card-title">Scanned Product Details</h2>
+        <span class="badge" [class.badge-success]="product" [class.badge-slate]="!product">
+          {{ product ? 'Verified SKU' : 'Awaiting Scan' }}
+        </span>
+      </div>
+
+      <div class="card-body" *ngIf="product">
+        <div class="verified-header">
+          <div class="verified-icon">📦</div>
+          <div>
+            <h3 class="prod-name">{{ product.name }}</h3>
+            <div class="sku-pill">SKU: {{ product.barcode }}</div>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-box">
+            <span class="detail-label">Category</span>
+            <span class="detail-val badge badge-slate">{{ product.category || 'General' }}</span>
+          </div>
+
+          <div class="detail-box">
+            <span class="detail-label">Retail Price</span>
+            <span class="detail-val price-val">₹{{ product.price | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="detail-box">
+            <span class="detail-label">Current Stock</span>
+            <span class="detail-val" [class.danger]="product.quantity < 10">{{ product.quantity }} units</span>
+          </div>
+
+          <div class="detail-box">
+            <span class="detail-label">Inventory Health</span>
+            <span class="badge" [class.badge-danger]="product.quantity < 10" [class.badge-success]="product.quantity >= 10">
+              {{ product.quantity < 10 ? 'Low Stock' : 'Good' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="product-actions">
+          <button class="btn btn-secondary btn-block" (click)="clearBarcode()">
+            Clear Terminal
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body empty-scan" *ngIf="!product">
+        <div class="empty-terminal-icon">▣</div>
+        <h4>No Product Scanned Yet</h4>
+        <p>Scan a physical barcode or enter a barcode from your products catalog to review instant stock status.</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

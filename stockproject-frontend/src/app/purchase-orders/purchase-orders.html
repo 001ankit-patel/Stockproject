@@ -1,0 +1,140 @@
+<div class="purchase-orders-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Purchase Order Management</h1>
+      <p class="page-subtitle">Procurement cycles, supplier purchase contracts, and delivery receipts</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="refreshOrders()">
+        <span>↻ Refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Metric Badges Row -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon-wrap indigo">📋</div>
+      <div>
+        <div class="stat-sub">Total POs</div>
+        <div class="stat-num">{{ totalOrders }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap amber">⏳</div>
+      <div>
+        <div class="stat-sub">Pending Review</div>
+        <div class="stat-num">{{ pendingOrders }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap cyan">👍</div>
+      <div>
+        <div class="stat-sub">Approved</div>
+        <div class="stat-num">{{ approvedOrders }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap emerald">✅</div>
+      <div>
+        <div class="stat-sub">Received</div>
+        <div class="stat-num">{{ receivedOrders }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap purple">💰</div>
+      <div>
+        <div class="stat-sub">Procurement Value</div>
+        <div class="stat-num">₹{{ totalPurchaseValue | number:'1.2-2' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Table Card -->
+  <div class="card table-card">
+
+    <div class="table-toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Filter by PO number, supplier, item, or status..."
+          [(ngModel)]="searchText"
+        />
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="enterprise-table">
+        <thead>
+          <tr>
+            <th style="width: 100px;">PO Number</th>
+            <th>Vendor / Supplier</th>
+            <th>Product Name</th>
+            <th>Order Qty</th>
+            <th>Total Cost</th>
+            <th>Issued Date</th>
+            <th>Expected Delivery</th>
+            <th>PO Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let order of filteredPurchaseOrders">
+            <td>
+              <span class="id-badge">#PO-{{ order.id }}</span>
+            </td>
+            <td>
+              <div class="customer-name">🚚 {{ order.supplier }}</div>
+            </td>
+            <td>
+              <div class="product-name">{{ order.product }}</div>
+            </td>
+            <td>
+              <span class="qty-badge">{{ order.quantity }}</span>
+            </td>
+            <td>
+              <strong class="total-text">₹{{ order.total | number:'1.2-2' }}</strong>
+            </td>
+            <td>
+              <span class="date-text">{{ order.orderDate || '—' }}</span>
+            </td>
+            <td>
+              <span class="date-text">{{ order.expectedDate || '—' }}</span>
+            </td>
+            <td>
+              <span class="badge"
+                [class.badge-warning]="order.status === 'Pending'"
+                [class.badge-indigo]="order.status === 'Approved'"
+                [class.badge-success]="order.status === 'Received'">
+                {{ order.status }}
+              </span>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredPurchaseOrders.length === 0">
+            <td colspan="8" class="empty-state-cell">
+              <div class="empty-content">
+                <span class="empty-icon">📋</span>
+                <p>No purchase orders matching the filter.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Showing <strong>{{ filteredPurchaseOrders.length }}</strong> purchase orders</span>
+    </div>
+
+  </div>
+
+</div>

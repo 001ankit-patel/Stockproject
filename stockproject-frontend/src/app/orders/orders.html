@@ -1,0 +1,166 @@
+<div class="orders-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Order Fulfillment & Sales</h1>
+      <p class="page-subtitle">Track incoming retail orders, status lifecycles & sales revenue</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="exportCSV()" [disabled]="orders.length === 0">
+        <span>📥 Export CSV</span>
+      </button>
+      <button class="btn btn-secondary" (click)="refreshOrders()">
+        <span>↻ Refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Metric Badges Row -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon-wrap indigo">🛒</div>
+      <div>
+        <div class="stat-sub">Total Orders</div>
+        <div class="stat-num">{{ totalOrders }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap amber">⏳</div>
+      <div>
+        <div class="stat-sub">Pending</div>
+        <div class="stat-num">{{ pendingOrders }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap cyan">⚙️</div>
+      <div>
+        <div class="stat-sub">Processing</div>
+        <div class="stat-num">{{ processingOrders }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap emerald">✅</div>
+      <div>
+        <div class="stat-sub">Completed</div>
+        <div class="stat-num">{{ completedOrders }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap purple">💰</div>
+      <div>
+        <div class="stat-sub">Total Sales</div>
+        <div class="stat-num">₹{{ totalSales | number:'1.2-2' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Table Card -->
+  <div class="card table-card">
+
+    <div class="table-toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Filter by Order ID, customer name, product, or status..."
+          [(ngModel)]="searchText"
+        />
+      </div>
+
+      <div class="filter-pills">
+        <button 
+          class="pill-btn" 
+          [class.active]="statusFilter === 'ALL'" 
+          (click)="setStatusFilter('ALL')">
+          All ({{ orders.length }})
+        </button>
+        <button 
+          class="pill-btn" 
+          [class.active]="statusFilter === 'Pending'" 
+          (click)="setStatusFilter('Pending')">
+          Pending ({{ pendingOrders }})
+        </button>
+        <button 
+          class="pill-btn" 
+          [class.active]="statusFilter === 'Processing'" 
+          (click)="setStatusFilter('Processing')">
+          Processing ({{ processingOrders }})
+        </button>
+        <button 
+          class="pill-btn" 
+          [class.active]="statusFilter === 'Completed'" 
+          (click)="setStatusFilter('Completed')">
+          Completed ({{ completedOrders }})
+        </button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="enterprise-table">
+        <thead>
+          <tr>
+            <th style="width: 90px;">Order ID</th>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Total Value</th>
+            <th>Order Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let order of filteredOrders">
+            <td>
+              <span class="id-badge">#{{ order.id }}</span>
+            </td>
+            <td>
+              <div class="customer-name">{{ order.customer }}</div>
+            </td>
+            <td>
+              <div class="product-name">{{ order.product }}</div>
+            </td>
+            <td>
+              <span class="qty-badge">{{ order.quantity }}</span>
+            </td>
+            <td>
+              <strong class="total-text">₹{{ order.total | number:'1.2-2' }}</strong>
+            </td>
+            <td>
+              <span class="date-text">{{ order.date || 'Today' }}</span>
+            </td>
+            <td>
+              <span class="badge"
+                [class.badge-success]="order.status === 'Completed'"
+                [class.badge-warning]="order.status === 'Pending'"
+                [class.badge-indigo]="order.status === 'Processing'">
+                {{ order.status }}
+              </span>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredOrders.length === 0">
+            <td colspan="7" class="empty-state-cell">
+              <div class="empty-content">
+                <span class="empty-icon">🛒</span>
+                <p>No orders found matching the filter criteria.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Showing <strong>{{ filteredOrders.length }}</strong> of <strong>{{ orders.length }}</strong> recorded orders</span>
+    </div>
+
+  </div>
+
+</div>

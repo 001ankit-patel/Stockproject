@@ -1,0 +1,183 @@
+<div class="inventory-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Multi-Location Inventory</h1>
+      <p class="page-subtitle">Warehouse & store distribution, stock levels, and threshold control</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="exportCSV()" [disabled]="inventory.length === 0">
+        <span>📥 Export CSV</span>
+      </button>
+      <button class="btn btn-secondary" (click)="refreshInventory()">
+        <span>↻ Refresh</span>
+      </button>
+      <button class="btn btn-primary" (click)="showAddModal = !showAddModal">
+        <span>{{ showAddModal ? '✕ Close Form' : '+ Add Stock Entry' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon-wrap indigo">📦</div>
+      <div>
+        <div class="stat-sub">Total Units Stored</div>
+        <div class="stat-num">{{ totalItems }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap amber">⚠️</div>
+      <div>
+        <div class="stat-sub">Low Stock Alerts</div>
+        <div class="stat-num">{{ lowStockItems }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap cyan">📍</div>
+      <div>
+        <div class="stat-sub">Active Facilities</div>
+        <div class="stat-num">{{ totalLocations }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Inventory Modal Form -->
+  <div class="card add-form-card" *ngIf="showAddModal">
+    <div class="card-header">
+      <h2 class="card-title">Assign Stock To Facility</h2>
+      <p class="card-subtitle">Set warehouse location and item quantity</p>
+    </div>
+
+    <div class="form-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" placeholder="e.g. Wireless Mouse" [(ngModel)]="newItem.product" />
+        </div>
+
+        <div class="form-group">
+          <label>Barcode / SKU</label>
+          <input type="text" placeholder="e.g. 89010005" [(ngModel)]="newItem.barcode" />
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <input type="text" placeholder="e.g. Electronics" [(ngModel)]="newItem.category" />
+        </div>
+
+        <div class="form-group">
+          <label>Location / Store *</label>
+          <input type="text" placeholder="e.g. Main Warehouse, Store A" [(ngModel)]="newItem.location" />
+        </div>
+
+        <div class="form-group">
+          <label>Units Quantity *</label>
+          <input type="number" placeholder="0" [(ngModel)]="newItem.quantity" />
+        </div>
+
+        <div class="form-group submit-group">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary btn-block" (click)="addItem()">
+            Confirm Entry
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventory Table Card -->
+  <div class="card table-card">
+
+    <div class="table-toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Filter by product, SKU, category, or location..."
+          [(ngModel)]="searchText"
+        />
+      </div>
+
+      <div class="filter-actions">
+        <select [(ngModel)]="selectedLocation" class="location-select">
+          <option value="ALL">All Facilities ({{ locations.length }})</option>
+          <option *ngFor="let loc of locations" [value]="loc">{{ loc }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="enterprise-table">
+        <thead>
+          <tr>
+            <th style="width: 70px;">ID</th>
+            <th>Product</th>
+            <th>Barcode / SKU</th>
+            <th>Category</th>
+            <th>Facility / Location</th>
+            <th>Quantity</th>
+            <th>Health Status</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of filteredInventory">
+            <td><span class="id-badge">#{{ item.id }}</span></td>
+            <td>
+              <div class="product-title">{{ item.product }}</div>
+            </td>
+            <td>
+              <span class="barcode-badge">{{ item.barcode || '—' }}</span>
+            </td>
+            <td>
+              <span class="badge badge-slate">{{ item.category || 'General' }}</span>
+            </td>
+            <td>
+              <span class="location-pill">📍 {{ item.location }}</span>
+            </td>
+            <td>
+              <strong class="stock-badge" [class.critical]="item.quantity < 5" [class.warning]="item.quantity >= 5 && item.quantity < 10">
+                {{ item.quantity }} units
+              </strong>
+            </td>
+            <td>
+              <span class="badge"
+                [class.badge-danger]="item.quantity < 5"
+                [class.badge-warning]="item.quantity >= 5 && item.quantity < 10"
+                [class.badge-success]="item.quantity >= 10">
+                {{ item.quantity < 5 ? 'Critical' : (item.quantity < 10 ? 'Low Stock' : 'Optimal') }}
+              </span>
+            </td>
+            <td style="text-align: right;">
+              <button class="btn-delete" (click)="deleteItem(item.id)" title="Remove item">
+                Remove
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredInventory.length === 0">
+            <td colspan="8" class="empty-state-cell">
+              <div class="empty-content">
+                <span class="empty-icon">🏪</span>
+                <p>No inventory records matching your search.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Showing <strong>{{ filteredInventory.length }}</strong> inventory records</span>
+    </div>
+
+  </div>
+
+</div>

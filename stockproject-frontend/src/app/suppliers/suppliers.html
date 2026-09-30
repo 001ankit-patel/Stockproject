@@ -1,0 +1,135 @@
+<div class="suppliers-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Supplier Network</h1>
+      <p class="page-subtitle">Manage trusted distributors, vendor contacts & supply contracts</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="loadSuppliers()">
+        <span>↻ Refresh</span>
+      </button>
+      <button class="btn btn-primary" (click)="showAddModal = !showAddModal">
+        <span>{{ showAddModal ? '✕ Close Form' : '+ Add Supplier' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Add Supplier Card -->
+  <div class="card add-form-card" *ngIf="showAddModal">
+    <div class="card-header">
+      <h2 class="card-title">Register Vendor / Supplier</h2>
+      <p class="card-subtitle">Enter company information and contact details</p>
+    </div>
+
+    <div class="form-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Company / Supplier Name *</label>
+          <input type="text" placeholder="e.g. Apex Global Distributors" [(ngModel)]="supplier.name" />
+        </div>
+
+        <div class="form-group">
+          <label>Contact Person</label>
+          <input type="text" placeholder="e.g. Rahul Sharma" [(ngModel)]="supplier.contactPerson" />
+        </div>
+
+        <div class="form-group">
+          <label>Contact Phone</label>
+          <input type="text" placeholder="e.g. +91 98765 43210" [(ngModel)]="supplier.phone" />
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" placeholder="e.g. orders@apexdist.com" [(ngModel)]="supplier.email" />
+        </div>
+
+        <div class="form-group">
+          <label>Warehouse Address</label>
+          <input type="text" placeholder="e.g. Sector 18, Industrial Area" [(ngModel)]="supplier.address" />
+        </div>
+
+        <div class="form-group submit-group">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary btn-block" (click)="addSupplier()">
+            Save Supplier
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="card table-card">
+
+    <div class="table-toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Search suppliers by name, contact, phone, or location..."
+          [(ngModel)]="searchText"
+        />
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="enterprise-table">
+        <thead>
+          <tr>
+            <th style="width: 70px;">ID</th>
+            <th>Supplier Name</th>
+            <th>Contact Person</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Office / Warehouse Address</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let s of filteredSuppliers">
+            <td><span class="id-badge">#{{ s.id }}</span></td>
+            <td>
+              <div class="product-title">🚚 {{ s.name }}</div>
+            </td>
+            <td>
+              <span class="manager-name">{{ s.contactPerson || '—' }}</span>
+            </td>
+            <td>
+              <span class="phone-text">{{ s.phone || '—' }}</span>
+            </td>
+            <td>
+              <span class="email-text">{{ s.email || '—' }}</span>
+            </td>
+            <td>
+              <span class="address-text">{{ s.address || '—' }}</span>
+            </td>
+            <td style="text-align: right;">
+              <button class="btn-delete" (click)="deleteSupplier(s.id)">
+                Delete
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredSuppliers.length === 0">
+            <td colspan="7" class="empty-state-cell">
+              <div class="empty-content">
+                <span class="empty-icon">🚚</span>
+                <p>No suppliers found matching your query.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Showing <strong>{{ filteredSuppliers.length }}</strong> registered supply partners</span>
+    </div>
+
+  </div>
+
+</div>

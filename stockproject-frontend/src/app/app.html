@@ -1,0 +1,124 @@
+<div class="app-layout" *ngIf="isLoggedIn()">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+
+    <!-- Brand Header -->
+    <div class="brand">
+      <div class="brand-logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m7.5 4.27 9 5.15"></path>
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+          <path d="m3.3 7 8.7 5 8.7-5"></path>
+          <path d="M12 22V12"></path>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">StockSmart</span>
+        <span class="brand-tag">Enterprise ERP</span>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-menu">
+      <div class="nav-section-title">CORE OPERATIONS</div>
+
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+
+      <a routerLink="/products" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📦</span>
+        <span class="nav-label">Products</span>
+      </a>
+
+      <a routerLink="/inventory" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🏪</span>
+        <span class="nav-label">Inventory</span>
+      </a>
+
+      <a routerLink="/orders" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">Orders</span>
+      </a>
+
+      <div class="nav-section-title">LOGISTICS & TRACKING</div>
+
+      <a routerLink="/suppliers" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🚚</span>
+        <span class="nav-label">Suppliers</span>
+      </a>
+
+      <a routerLink="/locations" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📍</span>
+        <span class="nav-label">Locations</span>
+      </a>
+
+      <a routerLink="/purchase-orders" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Purchase Orders</span>
+      </a>
+
+      <a routerLink="/barcode" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">▣</span>
+        <span class="nav-label">Barcode / RFID</span>
+      </a>
+
+      <div class="nav-section-title">INTELLIGENCE</div>
+
+      <a routerLink="/reports" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📈</span>
+        <span class="nav-label">Analytics & Reports</span>
+      </a>
+    </nav>
+
+    <!-- Sidebar Bottom User Info -->
+    <div class="sidebar-footer">
+      <div class="user-pill" routerLink="/admin">
+        <div class="user-avatar">{{ getUserInitials() }}</div>
+        <div class="user-info">
+          <div class="user-name">{{ getCurrentUser()?.username || 'Admin' }}</div>
+          <div class="user-role">{{ getCurrentUser()?.role || 'Administrator' }}</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Main View Container -->
+  <main class="main-content">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="live-pill">
+          <span class="pulse-dot"></span>
+          <span class="live-text">Live Sync Connected</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a routerLink="/admin" class="topbar-btn" title="Admin Settings">
+          <span>⚙️</span>
+          <span>Admin Portal</span>
+        </a>
+
+        <button class="logout-btn" (click)="logout()" title="Sign Out">
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content Container -->
+    <section class="page-content">
+      <router-outlet></router-outlet>
+    </section>
+
+  </main>
+
+</div>
+
+<div *ngIf="!isLoggedIn()" class="public-container">
+  <router-outlet></router-outlet>
+</div>

@@ -1,0 +1,150 @@
+<div class="admin-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Administration & Security</h1>
+      <p class="page-subtitle">Configure organization settings, currencies, and manage team member access roles</p>
+    </div>
+  </div>
+
+  <div class="settings-grid">
+
+    <!-- System Preferences -->
+    <div class="card settings-card">
+      <div class="card-header">
+        <h2 class="card-title">System Preferences</h2>
+        <p class="card-subtitle">Global organization defaults</p>
+      </div>
+
+      <div class="card-body">
+        <div class="form-group">
+          <label>Store / Entity Name</label>
+          <input type="text" value="StockSmart Retail Solutions" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label>Default Currency</label>
+          <select class="form-control">
+            <option selected>INR (₹) — Indian Rupee</option>
+            <option>USD ($) — US Dollar</option>
+            <option>EUR (€) — Euro</option>
+            <option>GBP (£) — British Pound</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Inventory Threshold Default</label>
+          <input type="number" value="15" class="form-control" />
+        </div>
+
+        <button class="btn btn-primary btn-block">
+          Save Configuration
+        </button>
+      </div>
+    </div>
+
+    <!-- User Management -->
+    <div class="card user-mgmt-card">
+      <div class="card-header flex-header">
+        <div>
+          <h2 class="card-title">User Accounts & Roles</h2>
+          <p class="card-subtitle">Control authorized users who can access and manage stock</p>
+        </div>
+
+        <button class="btn btn-secondary btn-sm" (click)="toggleAddForm()">
+          {{ showAddForm ? '✕ Close' : '+ New User' }}
+        </button>
+      </div>
+
+      <div class="card-body">
+
+        <div class="alert alert-danger" *ngIf="errorMessage">
+          ⚠️ {{ errorMessage }}
+        </div>
+        <div class="alert alert-success" *ngIf="successMessage">
+          ✅ {{ successMessage }}
+        </div>
+
+        <!-- Add User Slide-in Box -->
+        <div class="add-user-panel" *ngIf="showAddForm">
+          <h3 class="panel-title">Add Team Member</h3>
+          <div class="panel-grid">
+            <div class="form-group">
+              <label>Username *</label>
+              <input type="text" [(ngModel)]="newUser.username" placeholder="e.g. john_doe" />
+            </div>
+
+            <div class="form-group">
+              <label>Password *</label>
+              <input type="password" [(ngModel)]="newUser.password" placeholder="••••••••" />
+            </div>
+
+            <div class="form-group">
+              <label>Role</label>
+              <select [(ngModel)]="newUser.role">
+                <option value="Staff">Staff</option>
+                <option value="Manager">Manager</option>
+                <option value="Administrator">Administrator</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="panel-actions">
+            <button class="btn btn-primary btn-sm" (click)="addUser()">Create Account</button>
+            <button class="btn btn-secondary btn-sm" (click)="toggleAddForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="enterprise-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">ID</th>
+                <th>Username</th>
+                <th>Access Level</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let user of users">
+                <td><span class="id-badge">#{{ user.id }}</span></td>
+                <td>
+                  <div class="user-row-name">
+                    <span class="user-avatar-mini">{{ user.username ? user.username.slice(0, 2).toUpperCase() : 'US' }}</span>
+                    <strong>{{ user.username }}</strong>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge"
+                    [class.badge-indigo]="user.role === 'Administrator' || user.role === 'ADMIN'"
+                    [class.badge-cyan]="user.role === 'Manager'"
+                    [class.badge-slate]="user.role === 'Staff' || !user.role">
+                    {{ user.role || 'Staff' }}
+                  </span>
+                </td>
+                <td style="text-align: right;">
+                  <button class="btn-delete" (click)="deleteUser(user)">Delete</button>
+                </td>
+              </tr>
+
+              <tr *ngIf="users.length === 0">
+                <td colspan="4" class="empty-state-cell">
+                  <div class="empty-content">
+                    <span class="empty-icon">👥</span>
+                    <p>No user accounts found.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

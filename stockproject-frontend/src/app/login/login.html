@@ -1,0 +1,88 @@
+<div class="login-wrapper">
+
+  <div class="login-card">
+
+    <div class="card-brand">
+      <div class="brand-badge">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m7.5 4.27 9 5.15"></path>
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+          <path d="m3.3 7 8.7 5 8.7-5"></path>
+          <path d="M12 22V12"></path>
+        </svg>
+      </div>
+      <h2>StockSmart</h2>
+      <p>Enterprise Retail Inventory & Supply Chain</p>
+    </div>
+
+    <div class="card-body">
+      <div class="auth-header">
+        <h3>{{ isRegisterMode ? 'Create New Account' : 'Welcome Back' }}</h3>
+        <p>{{ isRegisterMode ? 'Enter credentials to set up a new portal user' : 'Sign in to access your retail inventory workspace' }}</p>
+      </div>
+
+      <div class="alert alert-danger" *ngIf="errorMessage">
+        ⚠️ {{ errorMessage }}
+      </div>
+
+      <div class="alert alert-success" *ngIf="successMessage">
+        ✅ {{ successMessage }}
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="auth-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input 
+            type="text" 
+            [(ngModel)]="username" 
+            name="username" 
+            placeholder="e.g. ankit or admin" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input 
+            type="password" 
+            [(ngModel)]="password" 
+            name="password" 
+            placeholder="••••••••" 
+            required 
+          />
+        </div>
+
+        <div class="form-group" *ngIf="isRegisterMode">
+          <label>Access Role</label>
+          <select [(ngModel)]="role" name="role">
+            <option value="Staff">Staff</option>
+            <option value="Manager">Manager</option>
+            <option value="Administrator">Administrator</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" [disabled]="isLoading">
+          <span *ngIf="!isLoading">{{ isRegisterMode ? 'Create Account' : 'Sign In to Dashboard' }}</span>
+          <span *ngIf="isLoading">{{ isRegisterMode ? 'Creating...' : 'Authenticating...' }}</span>
+        </button>
+
+        <div class="toggle-mode">
+          <span *ngIf="!isRegisterMode">
+            Don't have an account yet? 
+            <a (click)="toggleMode()">Create Account</a>
+          </span>
+          <span *ngIf="isRegisterMode">
+            Already have credentials? 
+            <a (click)="toggleMode()">Sign In</a>
+          </span>
+        </div>
+      </form>
+    </div>
+
+    <div class="card-footer">
+      <span>🔒 256-bit TLS Encrypted ERP Gateway</span>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,313 @@
+<div class="dashboard-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Executive Overview</h1>
+      <p class="page-subtitle">Real-time inventory optimization, stock distribution & sales analytics</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="loadStats()" [disabled]="loading">
+        <span class="refresh-icon" [class.spinning]="loading">↻</span>
+        <span>{{ loading ? 'Syncing...' : 'Refresh Data' }}</span>
+      </button>
+      <a routerLink="/products" class="btn btn-primary">
+        <span>+ Add Product</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Key Performance Metrics Cards -->
+  <div class="stats-grid">
+
+    <!-- Card 1: Total Products -->
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-label">Total Catalog Products</span>
+        <div class="stat-icon-wrapper indigo">
+          <span>📦</span>
+        </div>
+      </div>
+      <div class="stat-card-body">
+        <div class="stat-value">{{ totalProducts }}</div>
+        <div class="stat-trend positive">
+          <span class="trend-badge">Active</span>
+          <span class="trend-text">Across {{ totalLocations }} locations</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Total Stock Units -->
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-label">Total Stock Volume</span>
+        <div class="stat-icon-wrapper cyan">
+          <span>🏪</span>
+        </div>
+      </div>
+      <div class="stat-card-body">
+        <div class="stat-value">{{ totalStock }} <span class="stat-unit">units</span></div>
+        <div class="stat-trend" [class.negative]="lowStock > 0" [class.positive]="lowStock === 0">
+          <span class="trend-badge" [class.badge-danger]="lowStock > 0" [class.badge-success]="lowStock === 0">
+            {{ lowStock > 0 ? (lowStock + ' Low Stock') : 'Optimal' }}
+          </span>
+          <span class="trend-text">Inventory health</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Total Orders & Sales -->
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-label">Orders & Fulfillment</span>
+        <div class="stat-icon-wrapper emerald">
+          <span>🛒</span>
+        </div>
+      </div>
+      <div class="stat-card-body">
+        <div class="stat-value">{{ totalOrders }}</div>
+        <div class="stat-trend" [class.warning]="pendingOrders > 0">
+          <span class="trend-badge" [class.badge-warning]="pendingOrders > 0" [class.badge-slate]="pendingOrders === 0">
+            {{ pendingOrders }} Pending
+          </span>
+          <span class="trend-text">{{ formatCurrency(totalSales) }} total value</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Supplier Network -->
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-label">Verified Suppliers</span>
+        <div class="stat-icon-wrapper amber">
+          <span>🚚</span>
+        </div>
+      </div>
+      <div class="stat-card-body">
+        <div class="stat-value">{{ totalSuppliers }}</div>
+        <div class="stat-trend positive">
+          <span class="trend-badge badge-indigo">Connected</span>
+          <span class="trend-text">Active supply lines</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Interactive Charts Section -->
+  <div class="charts-grid">
+
+    <!-- Chart 1: 7-Day Performance & Trends -->
+    <div class="card chart-card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Weekly Demand & Activity Trend</h2>
+          <p class="card-subtitle">Daily distribution over the past 7 days</p>
+        </div>
+
+        <div class="chart-toggles">
+          <button 
+            type="button"
+            class="toggle-btn" 
+            [class.active]="chartMetric === 'orders'"
+            (click)="setChartMetric('orders')">
+            Orders
+          </button>
+          <button 
+            type="button"
+            class="toggle-btn" 
+            [class.active]="chartMetric === 'revenue'"
+            (click)="setChartMetric('revenue')">
+            Revenue (₹)
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Bar Chart Container -->
+      <div class="chart-body">
+        <div class="chart-bars-container">
+          <div 
+            *ngFor="let day of weeklyTrend" 
+            class="chart-bar-group"
+            (mouseenter)="hoveredBar = day"
+            (mouseleave)="hoveredBar = null">
+            
+            <!-- Hover Tooltip -->
+            <div class="bar-tooltip" *ngIf="hoveredBar === day">
+              <div class="tooltip-date">{{ day.day }} ({{ day.date }})</div>
+              <div class="tooltip-metric">
+                <strong>{{ chartMetric === 'orders' ? day.orderCount + ' Orders' : formatCurrency(day.revenue) }}</strong>
+              </div>
+            </div>
+
+            <!-- Bar Fill -->
+            <div class="bar-track">
+              <div 
+                class="bar-fill" 
+                [style.height.%]="getBarHeight(day)"
+                [class.highlight]="day.orderCount > 0">
+              </div>
+            </div>
+
+            <!-- X-Axis Label -->
+            <span class="bar-label">{{ day.day }}</span>
+            <span class="bar-value-sub">
+              {{ chartMetric === 'orders' ? day.orderCount : formatCurrency(day.revenue) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-footer">
+        <div class="chart-summary">
+          <span class="summary-pill">📈 Total Period Revenue: <strong>{{ formatCurrency(totalSales) }}</strong></span>
+          <span class="summary-pill">📦 Total Orders: <strong>{{ totalOrders }}</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 2: Category Stock & Valuation Breakdown -->
+    <div class="card category-card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Inventory Category Breakdown</h2>
+          <p class="card-subtitle">Volume & percentage share per merchandise category</p>
+        </div>
+        <span class="badge badge-indigo">{{ categoryBreakdown.length }} Categories</span>
+      </div>
+
+      <div class="category-list">
+        <div *ngFor="let cat of categoryBreakdown; let i = index" class="category-item">
+          <div class="category-info">
+            <div class="category-name-group">
+              <span class="category-dot" [style.background-color]="getCategoryColor(i)"></span>
+              <span class="category-name">{{ cat.category }}</span>
+              <span class="category-count">({{ cat.productCount }} items)</span>
+            </div>
+            <div class="category-stats">
+              <span class="category-qty">{{ cat.totalQuantity }} units</span>
+              <span class="category-pct">{{ cat.percentage }}%</span>
+            </div>
+          </div>
+
+          <div class="progress-track">
+            <div 
+              class="progress-fill" 
+              [style.width.%]="cat.percentage"
+              [style.background-color]="getCategoryColor(i)">
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="categoryBreakdown.length === 0" class="empty-state">
+          <p>No category distribution available yet. Add products to view analytics.</p>
+        </div>
+      </div>
+
+      <div class="card-footer-action">
+        <a routerLink="/products" class="link-action">Explore Product Catalog →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Row: Low Stock Alerts & Quick Launchpad -->
+  <div class="dashboard-bottom-grid">
+
+    <!-- Critical Low Stock Alerts -->
+    <div class="card low-stock-card">
+      <div class="card-header">
+        <div class="title-with-badge">
+          <h2 class="card-title">Low Stock Restock Watchlist</h2>
+          <span class="badge" [class.badge-danger]="lowStock > 0" [class.badge-success]="lowStock === 0">
+            {{ lowStock > 0 ? (lowStock + ' Needing Attention') : 'All In Stock' }}
+          </span>
+        </div>
+        <a routerLink="/purchase-orders" class="btn btn-secondary btn-sm">Create PO</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="enterprise-table" *ngIf="lowStockItems.length > 0">
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Category</th>
+              <th>Current Stock</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of lowStockItems">
+              <td>
+                <div class="item-name">{{ item.name }}</div>
+                <div class="item-code">{{ item.barcode || 'NO-BARCODE' }}</div>
+              </td>
+              <td><span class="badge badge-slate">{{ item.category || 'General' }}</span></td>
+              <td>
+                <strong class="stock-num" [class.critical]="item.quantity < 5">{{ item.quantity }}</strong>
+              </td>
+              <td>
+                <span class="badge" [class.badge-danger]="item.quantity < 5" [class.badge-warning]="item.quantity >= 5">
+                  {{ item.quantity < 5 ? 'CRITICAL' : 'LOW' }}
+                </span>
+              </td>
+              <td>
+                <a routerLink="/purchase-orders" class="action-btn">Reorder</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="lowStockItems.length === 0" class="empty-state-card">
+          <span class="empty-icon">✅</span>
+          <p>All products have healthy inventory levels above the safety threshold.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Operations Launchpad -->
+    <div class="card launchpad-card">
+      <div class="card-header">
+        <h2 class="card-title">Operations Launchpad</h2>
+      </div>
+
+      <div class="launchpad-grid">
+        <a routerLink="/products" class="launch-item">
+          <div class="launch-icon bg-indigo">📦</div>
+          <div class="launch-details">
+            <span class="launch-title">Add Products</span>
+            <span class="launch-desc">Catalog & pricing updates</span>
+          </div>
+        </a>
+
+        <a routerLink="/orders" class="launch-item">
+          <div class="launch-icon bg-emerald">🛒</div>
+          <div class="launch-details">
+            <span class="launch-title">Order Processing</span>
+            <span class="launch-desc">Fulfill & track orders</span>
+          </div>
+        </a>
+
+        <a routerLink="/barcode" class="launch-item">
+          <div class="launch-icon bg-cyan">▣</div>
+          <div class="launch-details">
+            <span class="launch-title">Barcode / RFID</span>
+            <span class="launch-desc">Fast scanner lookup</span>
+          </div>
+        </a>
+
+        <a routerLink="/reports" class="launch-item">
+          <div class="launch-icon bg-amber">📈</div>
+          <div class="launch-details">
+            <span class="launch-title">KPI Reports</span>
+            <span class="launch-desc">Export executive audits</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</div>

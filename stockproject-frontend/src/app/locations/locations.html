@@ -1,0 +1,115 @@
+<div class="locations-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Facilities & Warehouses</h1>
+      <p class="page-subtitle">Configure distribution hubs, retail branches, and storage locations</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="refreshLocations()">
+        <span>↻ Refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon-wrap indigo">📍</div>
+      <div>
+        <div class="stat-sub">Total Facilities</div>
+        <div class="stat-num">{{ totalLocations }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap cyan">📦</div>
+      <div>
+        <div class="stat-sub">Aggregate Stock</div>
+        <div class="stat-num">{{ totalStock }} units</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap emerald">✅</div>
+      <div>
+        <div class="stat-sub">Operational</div>
+        <div class="stat-num">{{ activeLocations }} Active</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Location Table -->
+  <div class="card table-card">
+
+    <div class="table-toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Search by facility name, type, address or manager..."
+          [(ngModel)]="searchText"
+        />
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="enterprise-table">
+        <thead>
+          <tr>
+            <th style="width: 70px;">ID</th>
+            <th>Facility Name</th>
+            <th>Type</th>
+            <th>Address</th>
+            <th>Manager</th>
+            <th>Stored Stock</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let loc of filteredLocations">
+            <td><span class="id-badge">#{{ loc.id }}</span></td>
+            <td>
+              <div class="product-title">📍 {{ loc.name }}</div>
+            </td>
+            <td>
+              <span class="badge badge-slate">{{ loc.type }}</span>
+            </td>
+            <td>
+              <span class="address-text">{{ loc.address }}</span>
+            </td>
+            <td>
+              <span class="manager-name">{{ loc.manager }}</span>
+            </td>
+            <td>
+              <strong>{{ loc.stock }} units</strong>
+            </td>
+            <td>
+              <span class="badge" [class.badge-success]="loc.status === 'Active'" [class.badge-slate]="loc.status !== 'Active'">
+                {{ loc.status }}
+              </span>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredLocations.length === 0">
+            <td colspan="7" class="empty-state-cell">
+              <div class="empty-content">
+                <span class="empty-icon">📍</span>
+                <p>No locations found matching your query.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Showing <strong>{{ filteredLocations.length }}</strong> registered locations</span>
+    </div>
+
+  </div>
+
+</div>

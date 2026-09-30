@@ -1,0 +1,140 @@
+<div class="reports-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Analytics & KPI Reports</h1>
+      <p class="page-subtitle">Business intelligence, stock audits, and executive performance summaries</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="refreshReports()" [disabled]="loading">
+        <span>{{ loading ? '↻ Loading...' : '↻ Refresh Data' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Summary Row -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon-wrap indigo">📦</div>
+      <div>
+        <div class="stat-sub">Catalog Size</div>
+        <div class="stat-num">{{ totalProducts }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap cyan">🏪</div>
+      <div>
+        <div class="stat-sub">Stock Volume</div>
+        <div class="stat-num">{{ totalStock }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap emerald">🛒</div>
+      <div>
+        <div class="stat-sub">Total Orders</div>
+        <div class="stat-num">{{ totalOrders }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap purple">💰</div>
+      <div>
+        <div class="stat-sub">Revenue</div>
+        <div class="stat-num">₹{{ totalSales | number:'1.0-0' }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap teal">🚚</div>
+      <div>
+        <div class="stat-sub">Suppliers</div>
+        <div class="stat-num">{{ totalSuppliers }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap amber">⚠️</div>
+      <div>
+        <div class="stat-sub">Low Stock Alerts</div>
+        <div class="stat-num">{{ lowStock }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Cards Grid -->
+  <div class="card reports-section">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Available Report Modules</h2>
+        <p class="card-subtitle">Generate downloadable audit-ready reports for each operational domain</p>
+      </div>
+    </div>
+
+    <div class="report-grid">
+      <div class="report-box" *ngFor="let report of reports">
+
+        <div class="report-icon-wrap">
+          <span class="report-icon-emoji">{{ report.icon }}</span>
+        </div>
+
+        <div class="report-body">
+          <h3 class="report-name">{{ report.name }}</h3>
+          <p class="report-desc">{{ report.description }}</p>
+
+          <div class="report-metric">
+            <strong>{{ report.value }}</strong>
+          </div>
+
+          <button class="btn btn-primary btn-sm" (click)="generateReport(report.name)">
+            Generate Report
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Business Overview Summary -->
+  <div class="card overview-card">
+    <div class="card-header">
+      <h2 class="card-title">Business Pulse Overview</h2>
+    </div>
+
+    <div class="overview-grid">
+      <div class="overview-item">
+        <span class="overview-label">Active Products</span>
+        <span class="overview-val">{{ totalProducts }}</span>
+      </div>
+
+      <div class="overview-item">
+        <span class="overview-label">Available Inventory</span>
+        <span class="overview-val">{{ totalStock }} units</span>
+      </div>
+
+      <div class="overview-item">
+        <span class="overview-label">Orders Processed</span>
+        <span class="overview-val">{{ totalOrders }}</span>
+      </div>
+
+      <div class="overview-item">
+        <span class="overview-label">Revenue Generated</span>
+        <span class="overview-val revenue">₹{{ totalSales | number:'1.0-0' }}</span>
+      </div>
+
+      <div class="overview-item">
+        <span class="overview-label">Low Stock Items</span>
+        <span class="overview-val danger">{{ lowStock }}</span>
+      </div>
+
+      <div class="overview-item">
+        <span class="overview-label">Supply Partners</span>
+        <span class="overview-val">{{ totalSuppliers }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>
